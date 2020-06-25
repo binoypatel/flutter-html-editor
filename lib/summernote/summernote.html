@@ -18,13 +18,17 @@
         toolbar: [
           ['style', ['style']],
           ['font', ['bold', 'underline', 'italic']],
+          ['fontsize', ['fontsize']],
           ['color', ['color']],
-          ['para', ['ul', 'ol', 'paragraph']],
-          ['insert', ['link', 'picture', 'hr', 'video']],
-          ['view', ['codeview']]
+          ['para', ['ul', 'ol', 'paragraph']]
         ],
         disableGrammar: false,
-        spellCheck: false
+        spellCheck: false,
+        callbacks: {
+          onChange: function(contents, $editable) {
+            SummernoteEditor.postMessage(contents);
+          }
+        }
       });
     </script>
 <style>

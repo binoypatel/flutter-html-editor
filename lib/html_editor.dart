@@ -27,6 +27,8 @@ class HtmlEditor extends StatefulWidget {
   final String widthImage;
   final bool showBottomToolbar;
   final String hint;
+  final EdgeInsetsGeometry padding;
+  final ValueChanged<String> onChanged;
 
   HtmlEditor(
       {Key key,
@@ -36,7 +38,10 @@ class HtmlEditor extends StatefulWidget {
       this.useBottomSheet = true,
       this.widthImage = "100%",
       this.showBottomToolbar = true,
-      this.hint})
+      this.hint,
+      this.onChanged,
+      this.padding =
+          const EdgeInsets.only(left: 4.0, right: 4, bottom: 8, top: 2)})
       : super(key: key);
 
   @override
@@ -126,7 +131,8 @@ class HtmlEditorState extends State<HtmlEditor> {
                     () => VerticalDragGestureRecognizer()..onUpdate = (_) {}),
               ].toSet(),
               javascriptChannels: <JavascriptChannel>[
-                getTextJavascriptChannel(context)
+                getTextJavascriptChannel(context),
+                onChangedCallbackJavascriptChannel(context)
               ].toSet(),
               onPageFinished: (String url) {
                 if (widget.hint != null) {
@@ -149,8 +155,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                 ),
           widget.showBottomToolbar
               ? Padding(
-                  padding: const EdgeInsets.only(
-                      left: 4.0, right: 4, bottom: 8, top: 2),
+                  padding: widget.padding,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
@@ -206,6 +211,24 @@ class HtmlEditorState extends State<HtmlEditor> {
           setState(() {
             text = isi;
           });
+        });
+  }
+
+  JavascriptChannel onChangedCallbackJavascriptChannel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'SummernoteEditor',
+        onMessageReceived: (JavascriptMessage message) {
+          String isi = message.message;
+          if (isi.isEmpty ||
+              isi == "<p></p>" ||
+              isi == "<p><br></p>" ||
+              isi == "<p><br/></p>") {
+            isi = "";
+          }
+          setState(() {
+            text = isi;
+          });
+          widget.onChanged(text);
         });
   }
 
@@ -304,6 +327,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
+                    widget.onChanged(await getText());
                   }),
             ),
           );
@@ -332,6 +356,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                 String txt =
                     "\$('.note-editable').append( '" + base64Image + "');";
                 _controller.evaluateJavascript(txt);
+                widget.onChanged(await getText());
               }),
             ));
           });
