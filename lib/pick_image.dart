@@ -11,7 +11,6 @@ typedef void CallbackValue(dynamic value);
 class PickImage extends StatelessWidget {
   final CallbackValue callbackFile;
   final Color color;
-  final ImagePicker _picker = ImagePicker();
 
   PickImage({this.callbackFile, this.color});
 
@@ -96,7 +95,7 @@ class PickImage extends StatelessWidget {
   }
 
   Future getImage(bool isKamera) async {
-    var image = await _picker.getImage(
+    var image = await ImagePicker.pickImage(
       source: isKamera ? ImageSource.camera : ImageSource.gallery,
       maxWidth: 800.0,
       maxHeight: 600.0,
