@@ -7,9 +7,11 @@ import 'package:image_picker/image_picker.dart';
  */
 
 typedef void CallbackValue(dynamic value);
+
 class PickImage extends StatelessWidget {
   final CallbackValue callbackFile;
   final Color color;
+  final ImagePicker _picker = ImagePicker();
 
   PickImage({this.callbackFile, this.color});
 
@@ -94,7 +96,7 @@ class PickImage extends StatelessWidget {
   }
 
   Future getImage(bool isKamera) async {
-    var image = await ImagePicker.pickImage(
+    var image = await _picker.getImage(
       source: isKamera ? ImageSource.camera : ImageSource.gallery,
       maxWidth: 800.0,
       maxHeight: 600.0,
